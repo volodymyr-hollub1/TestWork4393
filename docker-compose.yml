@@ -1,0 +1,49 @@
+version: "3.7"
+
+services:
+    db:
+        image: postgres:13.6-alpine3.15
+        container_name: postgres
+        restart: unless-stopped
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: ${DB_DATABASE}
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        volumes:
+            - ./storage/docker/_db:/var/lib/postgresql/data
+        networks:
+            - mynet
+    app:
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+        restart: unless-stopped
+        container_name: app
+        user: "${UID}:${GID}"
+        volumes:
+            - ./:/var/www
+            - ./docker/php/extend-php.ini:/user/local/php/etc/conf.d/extend-php.ini
+        depends_on:
+            - db
+        networks:
+            - mynet
+            - servernet
+    server:
+        image: nginx:1.21.4-alpine
+        container_name: server
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/conf.d/nginx.conf:/etc/nginx/nginx.conf
+            - ./storage/docker/logs/nginx/:/var/log/nginx/
+        ports:
+            - "80:80"
+        depends_on:
+            - app
+        networks:
+            - servernet
+
+networks:
+    mynet:
+    servernet:
