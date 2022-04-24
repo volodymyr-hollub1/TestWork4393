@@ -19,9 +19,11 @@ class StorePostAction extends BasePostAction
                 'slug' => $data['slug']
             ]
         );
-        
-        $post->tags()->attach($data['tags']);
-        
+
+        if ($data['tags']) {
+            $post->tags()->attach($data['tags']);
+        }
+
         return $post->fresh('tags');
     }
 }

@@ -19,7 +19,7 @@ class PostResource extends JsonResource
             'slug' => $this->slug,
             'title' => $this->title,
             'content' => $this->content,
-            'tags' => $this->tags->map(function ($tag) {
+            'tags' => $this->tags?->map(function ($tag) {
                 return [
                     'id' => $tag->id,
                     'title' => $tag->title

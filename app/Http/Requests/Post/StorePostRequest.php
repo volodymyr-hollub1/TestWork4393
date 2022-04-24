@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Post;
 
+use App\Rules\ExistsInTable;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePostRequest extends FormRequest
@@ -27,7 +28,7 @@ class StorePostRequest extends FormRequest
             'title' => 'required|string',
             'content' => 'required|string',
             'slug' => 'required|string',
-            'tags' =>  'required|array'
+            'tags' =>  ['array', new ExistsInTable('tags', 'id')]
         ];
     }
 }
