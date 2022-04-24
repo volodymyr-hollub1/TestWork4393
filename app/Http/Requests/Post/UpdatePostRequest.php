@@ -28,7 +28,8 @@ class UpdatePostRequest extends FormRequest
             'title' => 'string',
             'content' => 'string',
             'slug' => 'string',
-            'tags' => ['array', new ExistsInTable('tags', 'id')]
+            'tags' => ['array', new ExistsInTable('tags', 'id')],
+            'tags.*' => 'integer'
         ];
     }
 }

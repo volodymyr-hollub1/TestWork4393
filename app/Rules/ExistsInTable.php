@@ -28,23 +28,16 @@ class ExistsInTable implements Rule
     {
         $this->ruleEntity = $attribute;
 
-        $result = true;
-
-        if ($value) {
-            $countOfItems = count($value);
-            $ids = $countOfItems > 1 ? implode(", ", $value) : $value[0];
-
-
+        if ($value && is_integer($value)) {
             $result = DB::select("SELECT
             {$this->columnName} FROM {$this->table}
             WHERE {$this->columnName}
-            IN ({$ids}) GROUP BY
-            id HAVING COUNT(*) = {$countOfItems}");
+            = ({$value})");
 
-            return $result;
+            return $result ? true : false;
         }
 
-        return $result;
+        return false;
     }
 
     /**

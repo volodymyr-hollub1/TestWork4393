@@ -28,7 +28,8 @@ class StorePostRequest extends FormRequest
             'title' => 'required|string',
             'content' => 'required|string',
             'slug' => 'required|string',
-            'tags' =>  ['array', new ExistsInTable('tags', 'id')]
+            'tags' =>  ['array'],
+            'tags.*' => ['integer', new ExistsInTable('tags', 'id')]
         ];
     }
 }
