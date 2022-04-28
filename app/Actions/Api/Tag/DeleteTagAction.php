@@ -1,21 +1,13 @@
 <?php
 
-namespace App\Actions\Api\Tag;
+declare(strict_types=1);
 
-use Illuminate\Database\Eloquent\Collection;
+namespace App\Actions\Api\Tag;
 
 class DeleteTagAction extends BaseTagAction
 {
     public function __invoke(int $id): array
     {
-        $tag = $this->tagRepository->showOneSingleTag($id);
-        $tagTitle = $tag->title;
-
-        $tag->posts()->detach();
-        $tag->delete();
-
-        return [
-            'message' => "Tag {$tagTitle} deleted!"
-        ];
+        return $this->tagRepository->delete($id);
     }
 }

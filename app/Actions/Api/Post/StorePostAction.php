@@ -1,29 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Api\Post;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class StorePostAction extends BasePostAction
 {
     public function __invoke(array $data): Model
     {
-        $post = $this->postModel->firstOrCreate(
-            [
-                'title' => $data['title']
-            ],
-            [
-                'title' => $data['title'],
-                'content' => $data['content'],
-                'slug' => $data['slug']
-            ]
-        );
-
-        if ($data['tags']) {
-            $post->tags()->attach($data['tags']);
-        }
-
-        return $post->fresh('tags');
+        return $this->postRepository->store($data);
     }
 }

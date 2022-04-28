@@ -3,16 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\Post\Post;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Testing\TestResponse;
+use Illuminate\Database\Eloquent\Collection;
 
 class PostTest extends CoreTest
 {
-    use WithFaker;
-    use RefreshDatabase;
-    
-    public function testCorrectPost(): void
+    public function testCorrectPostCreating(): void
     {
         $post = [
             'title' => $this->faker->text(60),
@@ -27,9 +22,7 @@ class PostTest extends CoreTest
 
     public function testCorrectUpdate(): void
     {
-        $this->testCorrectPost();
-
-        $postId = Post::first()->id;
+        $oldPost = $this->getPostObject(1);
 
         $post = [
             'title' => $this->faker->text(60),
@@ -38,35 +31,31 @@ class PostTest extends CoreTest
             'tags' => []
         ];
 
-        $response = $this->putJson("/api/posts/{$postId}", $post, $this->getHeaders());
+        $response = $this->putJson("/api/posts/{$oldPost->id}", $post, $this->getHeaders());
         $response->assertStatus(200);
     }
 
     public function testCorrectDelete(): void
     {
-        $this->testCorrectPost();
+        $post = $this->getPostObject(1);
 
-        $postId = Post::first()->id;
-
-        $response = $this->delete("/api/posts/{$postId}", headers: $this->getHeaders());
+        $response = $this->delete("/api/posts/{$post->id}", headers: $this->getHeaders());
         $response->assertStatus(202);
     }
 
     public function testShowPosts(): void
     {
-        $this->testCorrectPost();
+        $this->getPostObject(100);
 
         $response = $this->getJson('/api/posts', $this->getHeaders());
-        $response->assertJsonCount(1, 'data');
+        $response->assertStatus(200);
     }
 
     public function testShowOneSinglePost(): void
     {
-        $this->testCorrectPost();
+        $post = $this->getPostObject(1);
 
-        $postId = Post::first()->id;
-
-        $response = $this->getJson("/api/posts/{$postId}", $this->getHeaders());
+        $response = $this->getJson("/api/posts/{$post->id}", $this->getHeaders());
 
         $response->assertJsonStructure([
             'data' => [
@@ -92,5 +81,11 @@ class PostTest extends CoreTest
 
         $response = $this->postJson('/api/posts', $post, $this->getHeaders());
         $response->assertStatus(422);
+    }
+
+    private function getPostObject(int $count): Post
+    {
+        $post = Post::factory($count)->create();
+        return $post[0];
     }
 }
