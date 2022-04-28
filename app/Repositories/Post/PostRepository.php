@@ -55,15 +55,16 @@ class PostRepository extends BaseRepository
 
     public function update(array $data, int $id): Model
     {
+        $post = $this->showOne($id);
+        
         try {
             DB::beginTransaction();
             
-            $post = $this->showOne($id);
             $tags = $data['tags'];
             unset($data['tags']);
             $post->update(array_filter($data));
             $post->tags()->sync($tags);
-            
+
             DB::commit();
         } catch (\Exception $exception) {
             DB::rollback();
@@ -77,21 +78,22 @@ class PostRepository extends BaseRepository
 
     public function delete(int $id): array
     {
+        $post = $this->showOne($id);
+        
         try {
             DB::beginTransaction();
             
-            $post = $this->showOne($id);
             $postId = $post->id;
             $post->tags()->detach();
             $post->delete();
-            
+
             DB::commit();
         } catch (\Exception $exception) {
             DB::rollBack();
             Log::info($exception->getMessage());
             abort(500, "Server error");
         }
-        
+
         return [
             'message' => "Post #{$postId} deleted"
         ];

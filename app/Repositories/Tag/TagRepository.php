@@ -24,8 +24,8 @@ class TagRepository extends BaseRepository
         $filter = app()->make(TagFilter::class, ['queryParams' => $data]);
 
         $result = $this->startCondition()->filter($filter)->get();
-
-        if (!$result) {
+        
+        if ($result->isEmpty()) {
             abort(404, 'Tags not found');
         }
 
@@ -51,10 +51,11 @@ class TagRepository extends BaseRepository
 
     public function delete(int $id): array
     {
+        $tag = $this->showOneSingleTag($id);
+        
         try {
             DB::beginTransaction();
-
-            $tag = $this->showOneSingleTag($id);
+            
             $tagTitle = $tag->title;
             $tag->posts()->detach();
             $tag->delete();
